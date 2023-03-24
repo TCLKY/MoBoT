@@ -1,4 +1,4 @@
-#include <arduino.h>
+#include <Arduino.h>
 #include <time.h>
 #include <SoftwareSerial.h>
 #include <Wheelctl.h>
@@ -27,7 +27,7 @@ void setup(){
 }
 void loop(){
 
-    Wheel maroue(2,3);
+    Wheel maroue(2,4);
 
 
     maroue.MoveWheelByStep(100,true, 10.0);
