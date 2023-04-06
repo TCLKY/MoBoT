@@ -49,15 +49,14 @@ class WheelAxle{
     public:
 
         WheelAxle();
-        WheelAxle(unsigned int stepL,unsigned int stepRS);
-
+        WheelAxle(short dirL, short stepL,short dirR, short stepR);
         enum axle_side {RIGHT , LEFT};
         enum axle_state{STOPPED,TRANSLATING,ROTATING,BOTH};
 
 
         int AxleRotate(float rotation, float custom_speed);
         int AxleMove(float distance, float custom_speed);
-        int GetInverted(void);
+        int GetInverted();
         void WheelInvert(enum axle_side side);
         enum axle_state GetAxleState();
     private:
@@ -71,11 +70,11 @@ class WheelAxle{
         float steps_per_mil;
         float max_speed;
         
-        DRIVER* motorL;
-        DRIVER* motorR;      
+        DRIVER  motorL;
+        DRIVER  motorR;      
           
         
-        SyncDriver* Axle;
+        SyncDriver Axle;
         
 
 };
