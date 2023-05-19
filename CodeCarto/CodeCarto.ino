@@ -15,5 +15,5 @@ distance = -3.5241e-06 * pow(sensorValue, 3) + 0.0036398 * pow(sensorValue, 2) -
   Serial.println(" cm"); 
   Serial.println(sensorValue);
   
-  delay(1000); 
+  delay(100); 
 }
