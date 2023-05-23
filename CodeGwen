@@ -9,46 +9,43 @@ const int sensorPin3 = A2;
 
 float distance,distance_droite,distance_gauche; 
 
-void setup() {
-    // Initialisation des moteurs ici ?
-  essieu.move(0,0);
-  essieu.rotate(0,0);  
-  Serial.begin(9600); 
-  delay(500);
+float etalon_sharp(float value){
+
+  return -3.5241e-06 * pow(value, 3) + 0.0036398 * pow(value, 2) -  1.2264 * value + 153.18;
+
 }
 
-float MEAN_Distance(int nb_sample){
-  float somme = 0;
-  float somme1 = 0;
-  float somme2 = 0;
-  float somme3 = 0;
-  int sensorValue1 = 0;
-  int sensorValue2 = 0;
-  int sensorValue3 = 0;
+float MEAN_Distance(int nb_sample, int analogpin){
 
+  float somme = 0;
+  
   for (int i = 0 ; i < nb_sample ; i++){   
-    // Stocke la valeur de tension lue sur la broche des capteurs
-    sensorValue1 = analogRead(sensorPin1);
-    sensorValue2 = analogRead(sensorPin2);
-    sensorValue3 = analogRead(sensorPin3); 
-    // Lit la valeur de tension des capteurs
-    // Stocke la distance calculée en fonction de la valeur de tension
-    somme1  += -3.5241e-06 * pow(sensorValue1, 3) + 0.0036398 * pow(sensorValue1, 2) -  1.2264 * sensorValue1 + 153.18; 
-    somme2  += -3.5241e-06 * pow(sensorValue2, 3) + 0.0036398 * pow(sensorValue2, 2) -  1.2264 * sensorValue2 + 153.18; 
-    somme3  += -3.5241e-06 * pow(sensorValue3, 3) + 0.0036398 * pow(sensorValue3, 2) -  1.2264 * sensorValue3 + 153.18; 
-    // Calcule la distance en centimètres 
-    somme = somme1 + somme2 + somme3;
+    
+    /* 
+      Lit la valeur de tension des capteurs,
+      convertit cette valeur en distance et l'ajoute à une variable
+    */
+    somme += etalon_sharp(analogRead(sensorPin1)); 
   }
   return somme/nb_sample;   // ajouter la valeur à la somme totale
 }
 
+void setup() {
+  //Construction de l'essieu
+  essieu.move(0,0); 
+  Serial.begin(9600); 
+  delay(500);
+}
+
+
 void loop() {
   float tab[NB_SAMPLE];
   int dm;
-  float distance = MEAN_Distance(NB_SAMPLE); 
+  // recupere distance du capteur centrale
+  float distance = MEAN_Distance(NB_SAMPLE,sensorPin2); 
   Serial.println(distance);
   delay(50);
-    if ((distance<10)and(distance>0)){ // le capteur détecte un obstacle
+    if ((distance<10) and (distance>0)){ // le capteur détecte un obstacle
       // A MODIFIER SELON LA VRAIE SYNTAXE DE TON CODE.
       essieu.move(X,V); // le robot s'arrete
       delay(500);
@@ -57,20 +54,20 @@ void loop() {
       essieu.move(X,V); // le robot s'arrete     
 }
 // calculer la distance entre le capteur et un obstacle s'il existe
-distance_droite = MEAN_Distance(NB_SAMPLE); 
+distance_droite = MEAN_Distance(NB_SAMPLE, sensorPin1); 
 delay(500);
-distance_gauche = MEAN_Distance(NB_SAMPLE);
+distance_gauche = MEAN_Distance(NB_SAMPLE,sensorPin3);
 delay(500);
 
- if (distance_droite<distance_gauche){
+ if (distance_droite < distance_gauche){
    essieu.rotate(-90,45); // faire tourner le robot à gauche
    delay(1000);  
    } 
   else {
    essieu.rotate(90,45); // faire tourner le robot à droite
    delay(1000);
- } 
-}
-else if (distance>0) {
-essieu.move(X,V) // faire avancer le robot
+  } 
+  else if (distance>0) {
+    essieu.move(X,V) // faire avancer le robot
+  }
 }
